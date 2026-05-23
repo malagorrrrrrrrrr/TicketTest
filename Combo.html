@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 SANRIO ARENA FESTIVAL 2027</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Mitr:wght@300;400;500;600&display=swap');
+        
+        * { box-sizing: border-box; font-family: 'Mitr', sans-serif; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        
+        body { background: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 50%, #ffd1dc 100%); color: #5c3a21; min-height: 100vh; }
+
+        /* Navigation */
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 8%; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; border-bottom: 3px dashed #ffb6c1; gap: 15px; }
+        .nav-left { display: flex; align-items: center; gap: 12px; }
+        .nav-logo { font-size: 24px; font-weight: 800; color: #ff69b4; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .nav-logo img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #ffcbd5; }
+        .nav-actions { display: flex; align-items: center; gap: 10px; }
+        .nav-profile { display: flex; align-items: center; gap: 8px; font-weight: 600; color: #d0417e; background: #fff0f5; padding: 8px 15px; border-radius: 20px; border: 2px solid #ffcbd5; transition: 0.2s;}
+        .nav-mini-btn { display: none; background: white; color: #ff69b4; border: 2px solid #ffcbd5; border-radius: 16px; padding: 8px 12px; font-weight: 700; cursor: pointer; }
+        .nav-mini-btn.show { display: inline-flex; align-items: center; gap: 6px; }
+
+        /* Main Container */
+        .main-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        .page-section { display: none; animation: fadeIn 0.4s ease; }
+        .page-active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Buttons */
+        .btn { width: 100%; padding: 15px; background: #ff69b4; color: white; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; transition: 0.2s; margin-top: 15px; font-size: 16px; }
+        .btn:hover { background: #d0417e; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3); }
+        .btn-secondary { background: #fff0f5; color: #ff69b4; border: 2px solid #ffcbd5; }
+        .btn-back { background: white; color: #ff69b4; border: 2px solid #ffcbd5; padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; font-size: 15px; margin-bottom: 25px; }
+
+        /* Layouts */
+        .selection-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 30px; }
+        .artist-card { background: white; border-radius: 25px; padding: 20px; border: 2px solid #ffe4e1; text-align: center; cursor: pointer; transition: 0.3s; position: relative; box-shadow: 0 10px 20px rgba(0,0,0,0.03); }
+        .artist-card:hover { transform: translateY(-10px); border-color: #ff69b4; }
+        .artist-card img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px dashed #ffcbd5; padding: 5px; margin-bottom: 15px; }
+        
+        .content-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; align-items: start; }
+        @media (max-width: 992px) { .content-layout { grid-template-columns: 1fr; } }
+        
+        .main-panel { background: #fff; padding: 30px; border-radius: 30px; border: 2px solid #ffe4e1; }
+        .side-panel { background: white; padding: 30px; border-radius: 30px; border: 2px solid #ffe4e1; position: sticky; top: 100px; }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; }
+        .total-price { font-size: 28px; font-weight: 800; color: #ff69b4; margin-top: 20px; border-top: 2px dashed #fff0f5; padding-top: 15px; }
+
+        /* AI Assistant Box (NEW) */
+        .ai-box { background: linear-gradient(135deg, #f3e5f5, #e1bee7); border: 2px solid #ce93d8; padding: 20px; border-radius: 20px; margin-bottom: 25px; }
+        .ai-box h3 { color: #8e24aa; font-size: 18px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .ai-input-group { display: flex; gap: 10px; margin-bottom: 10px; }
+        .ai-input-group input { flex: 1; padding: 10px; border-radius: 10px; border: 2px solid #ce93d8; font-family: 'Mitr'; outline: none; }
+        .ai-input-group button { background: #ab47bc; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .ai-input-group button:hover { background: #8e24aa; }
+        #ai-result { font-size: 14px; font-weight: 600; padding: 10px; border-radius: 10px; background: white; display: none; }
+        .mood-box { background: #fff8fb; border: 2px solid #ffcbd5; padding: 18px; border-radius: 20px; margin-bottom: 25px; }
+        .mood-box h3 { color: #d0417e; font-size: 18px; margin-bottom: 12px; }
+        .mood-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+        .mood-btn { background: white; color: #d0417e; border: 2px solid #ffcbd5; border-radius: 14px; padding: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .mood-btn:hover, .mood-btn.active { background: #ff69b4; color: white; border-color: #ff69b4; transform: translateY(-2px); }
+        .mood-result { display: none; margin-top: 12px; padding: 12px; background: white; border-radius: 14px; color: #6b4c35; border: 1px dashed #ffcbd5; font-size: 14px; }
+
+        /* Booking UI */
+        .stage-front { background: linear-gradient(135deg, #ff69b4, #ffcbd5); color: white; padding: 15px; border-radius: 20px; text-align: center; font-weight: 800; font-size: 22px; letter-spacing: 5px; margin-bottom: 30px; }
+        .seating-section { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .stadium-block { padding: 15px; border-radius: 15px; border: 2px solid #ffcbd5; }
+        .zone-A { background: #ffebee; border-color: #ffcdd2; }
+        .zone-B { background: #f3e5f5; border-color: #e1bee7; }
+        .zone-C { background: #e3f2fd; border-color: #bbdefb; }
+        .zone-D { background: #e8f5e9; border-color: #c8e6c9; }
+        
+        .block-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: 8px; margin-bottom: 10px; }
+        .block-header .zone-name { font-weight: 800; color: #d0417e; }
+        .block-header .zone-price { font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.7); padding: 2px 8px; border-radius: 10px; }
+
+        .block-grid { display: grid; grid-template-columns: repeat(15, minmax(16px, 1fr)); gap: 4px; }
+        .seat { aspect-ratio: 1; background-color: rgba(255,255,255,0.8); border-radius: 4px; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: #5c3a21; transition: 0.15s; }
+        .seat:hover { background-color: #ffcbd5; transform: scale(1.1); }
+        .seat.selected { background: #ff69b4 !important; color: white; border-color: #ff1493; transform: scale(1.1); box-shadow: 0 0 8px rgba(255,105,180,0.6); }
+        .seat.recommended { outline: 2px solid #ab47bc; box-shadow: 0 0 0 3px rgba(171, 71, 188, 0.18); }
+        .seat.occupied { background: #cfd8dc !important; color: #90a4ae; cursor: not-allowed; opacity: 0.5; }
+
+        /* Food Menu UI */
+        .food-section-title { color: #d0417e; margin: 20px 0 15px 0; font-size: 18px; border-bottom: 2px dashed #ffcbd5; padding-bottom: 5px; }
+        .food-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .food-card { background: #fff0f5; border: 2px solid #ffcbd5; border-radius: 15px; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .food-card.combo { background: #fff8e1; border-color: #ffe082; } /* สีพิเศษสำหรับคอมโบ */
+        .food-info { display: flex; flex-direction: column; flex: 1; padding-right: 10px; }
+        .food-title { font-weight: 700; color: #d0417e; font-size: 15px; line-height: 1.3; margin-bottom: 3px;}
+        .food-desc { font-size: 11px; color: #a1828a; margin-bottom: 5px; }
+        .food-price { color: #ff69b4; font-size: 14px; font-weight: 600; }
+        
+        .qty-control { display: flex; align-items: center; gap: 8px; background: white; padding: 5px; border-radius: 20px; border: 1px solid #ffcbd5; }
+        .qty-btn { background: none; border: none; font-size: 16px; color: #ff69b4; cursor: pointer; font-weight: 800; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+        .qty-number { font-weight: 700; color: #5c3a21; width: 15px; text-align: center; font-size: 14px;}
+
+        /* Ticket & Modals (Same as previous) */
+        .ticket-wrapper { max-width: 450px; margin: 0 auto; background: white; border-radius: 30px; border: 3px solid #ffcbd5; padding: 30px; text-align: center; position: relative; overflow: hidden; }
+        .ticket-wrapper.theme-sweet { background: linear-gradient(180deg, #fff 0%, #fff0f7 100%); border-color: #ff9fc9; }
+        .ticket-wrapper.theme-night { background: linear-gradient(180deg, #fff 0%, #f0edff 100%); border-color: #b39ddb; }
+        .ticket-wrapper.theme-mint { background: linear-gradient(180deg, #fff 0%, #ecfff6 100%); border-color: #94d8b4; }
+        .ticket-sticker { position: absolute; right: 16px; top: 14px; font-size: 30px; transform: rotate(10deg); }
+        .customizer-panel { max-width: 450px; margin: 18px auto 0; background: white; border: 2px dashed #ffcbd5; border-radius: 22px; padding: 18px; }
+        .customizer-panel h3 { color: #d0417e; margin-bottom: 12px; }
+        .customizer-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .customizer-btn { background: #fff0f5; color: #d0417e; border: 2px solid #ffcbd5; border-radius: 14px; padding: 10px; font-weight: 700; cursor: pointer; }
+        .customizer-btn:hover, .customizer-btn.active { background: #ff69b4; color: white; border-color: #ff69b4; }
+        .qr-box { width: 180px; height: 180px; background: #fdf2f5; margin: 20px auto; border-radius: 20px; border: 2px dashed #ffb6c1; padding: 10px; }
+        .qr-box img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+        .food-receipt-item { display: flex; justify-content: space-between; font-size: 13px; color: #6b4c35; border-bottom: 1px dashed #ffe4e1; padding: 5px 0; }
+        .vote-container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 30px; border: 2px solid #ffe4e1; text-align: center; }
+        .sortable-list { list-style: none; padding: 0; margin-top: 20px; }
+        .sortable-item { background: #fff0f5; border: 2px solid #ffcbd5; margin-bottom: 10px; padding: 15px 20px; border-radius: 15px; display: flex; align-items: center; justify-content: space-between; cursor: grab; font-weight: 600; color: #d0417e; }
+        .rank-number { background: #ff69b4; color: white; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 14px; margin-right: 15px; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: white; width: 90%; max-width: 400px; padding: 30px; border-radius: 25px; text-align: center; border: 3px solid #ffcbd5; position: relative; }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 20px; cursor: pointer; color: #a1828a; }
+        .guide-modal { max-width: 720px; }
+        .guide-tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 18px 0; }
+        .guide-tab { background: #fff0f5; color: #d0417e; border: 2px solid #ffcbd5; border-radius: 14px; padding: 10px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .guide-tab:hover, .guide-tab.active { background: #ff69b4; color: white; border-color: #ff69b4; }
+        .guide-detail { background: #fff8fb; border: 2px dashed #ffcbd5; border-radius: 18px; padding: 18px; text-align: left; color: #6b4c35; line-height: 1.7; }
+        .guide-detail h3 { color: #d0417e; margin-bottom: 8px; }
+        .guide-detail ul { padding-left: 22px; }
+        .payment-option { display: flex; align-items: center; gap: 15px; padding: 15px; border: 2px solid #ffe4e1; border-radius: 15px; margin-bottom: 10px; cursor: pointer; }
+        .payment-option:hover, .payment-option.active { border-color: #ff69b4; background: #fff0f5; }
+        #loading-spinner { display: none; margin: 20px auto; border: 4px solid #f3f3f3; border-top: 4px solid #ff69b4; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @media (max-width: 768px) {
+            .navbar { padding: 12px 20px; align-items: flex-start; }
+            .nav-left, .nav-actions { flex-wrap: wrap; }
+            .nav-logo { font-size: 18px; }
+            .block-grid { grid-template-columns: repeat(15, minmax(12px, 1fr)); }
+            .food-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255, 240, 245, 0.95); z-index:9999; align-items:center; justify-content:center; backdrop-filter: blur(10px);">
+        <div style="text-align:center; padding:40px; border-radius:30px; border:3px solid #ffcbd5; background:white; max-width:400px; width:90%;">
+            <h2 style="color:#d0417e; margin-bottom:20px;">Welcome to<br>Sanrio Arena 🌸</h2>
+            <div style="text-align: left; margin-bottom: 20px;">
+                <label style="font-size: 14px; color: #d0417e; font-weight: 600;">ชื่อของคุณ</label>
+                <input type="text" id="login-name" placeholder="ใส่ชื่อของคุณ" style="width: 100%; padding: 12px; border: 2px solid #ffcbd5; border-radius: 10px; font-family: 'Mitr'; outline: none; margin-top: 5px;">
+            </div>
+            <button class="btn" onclick="performLogin()">เข้าสู่ระบบ</button>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <div class="nav-left">
+            <button class="nav-mini-btn" id="global-back-btn" onclick="goBack()">ย้อนกลับ</button>
+            <div class="nav-logo" onclick="showPage('artist-page')">🌸 SANRIO FESTIVAL</div>
+        </div>
+        <div class="nav-actions">
+            <div class="nav-profile">👤 <span id="display-username">Guest</span></div>
+            <button class="nav-mini-btn show" onclick="openGuideModal()">คำแนะนำ</button>
+            <button class="nav-mini-btn show" onclick="logout()">ออก</button>
+        </div>
+    </nav>
+
+    <div class="main-container">
+
+        <div id="artist-page" class="page-section page-active">
+            <h1 style="text-align:center; color:#d0417e; font-size:32px;">เลือกคอนเสิร์ตที่คุณต้องการชม</h1>
+            <div class="selection-grid">
+                <div class="artist-card" onclick="startBooking('My Sweet Piano', '9 พฤษภาคม 2027', artistPriceSets['My Sweet Piano'])">
+                    <img src="sweet_piano.jpg" alt=""><h3>My Sweet Piano</h3><p style="color:#a1828a; font-size:14px;">A 4,200 / B 3,200 / C 2,200 / D 1,200</p>
+                </div>
+                <div class="artist-card" onclick="startBooking('My Melody', '15 มิถุนายน 2027', artistPriceSets['My Melody'])">
+                    <img src="mymelody.jpg" alt=""><h3>My Melody</h3><p style="color:#a1828a; font-size:14px;">A 3,900 / B 2,900 / C 1,900 / D 900</p>
+                </div>
+                <div class="artist-card" onclick="startBooking('Kuromi', '31 ตุลาคม 2027', artistPriceSets['Kuromi'])">
+                    <img src="kuromi.png" alt=""><h3>Kuromi</h3><p style="color:#a1828a; font-size:14px;">A 4,500 / B 3,500 / C 2,400 / D 1,400</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="booking-page" class="page-section">
+            <button class="btn-back" onclick="showPage('artist-page')">⬅️ เปลี่ยนศิลปิน</button>
+            <div class="content-layout">
+                <div class="main-panel">
+                    
+                    <div class="ai-box">
+                        <h3>✨ AI ช่วยเลือกที่นั่งตามงบประมาณ</h3>
+                        <div class="ai-input-group">
+                            <input type="number" id="ai-budget-input" placeholder="พิมพ์จำนวนเงินที่คุณมี (บาท)...">
+                            <button onclick="aiAnalyzeBudget()">วิเคราะห์เลย 🔍</button>
+                        </div>
+                        <div id="ai-result"></div>
+                    </div>
+
+                    <div class="mood-box">
+                        <h3>💘 Mood Seat Finder</h3>
+                        <div class="mood-grid">
+                            <button class="mood-btn" onclick="recommendMoodSeat('close', this)">ใกล้เวที</button>
+                            <button class="mood-btn" onclick="recommendMoodSeat('photo', this)">ถ่ายรูปสวย</button>
+                            <button class="mood-btn" onclick="recommendMoodSeat('friends', this)">มากับเพื่อน</button>
+                            <button class="mood-btn" onclick="recommendMoodSeat('budget', this)">งบประหยัด</button>
+                        </div>
+                        <div class="mood-result" id="mood-result"></div>
+                    </div>
+
+                    <div class="stage-front">🎀 STAGE 🎀</div>
+                    <div class="seating-section">
+                        <div class="stadium-block zone-A">
+                            <div class="block-header"><span class="zone-name">โซน A (ติดเวที)</span><span class="zone-price" id="price-A"></span></div>
+                            <div class="block-grid" id="gridA"></div>
+                        </div>
+                        <div class="stadium-block zone-B">
+                            <div class="block-header"><span class="zone-name">โซน B</span><span class="zone-price" id="price-B"></span></div>
+                            <div class="block-grid" id="gridB"></div>
+                        </div>
+                        <div class="stadium-block zone-C">
+                            <div class="block-header"><span class="zone-name">โซน C</span><span class="zone-price" id="price-C"></span></div>
+                            <div class="block-grid" id="gridC"></div>
+                        </div>
+                        <div class="stadium-block zone-D">
+                            <div class="block-header"><span class="zone-name">โซน D (หลังสุด)</span><span class="zone-price" id="price-D"></span></div>
+                            <div class="block-grid" id="gridD"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="side-panel">
+                    <h2 class="display-artist-name">Concert Name</h2>
+                    <div class="info-row"><span>วันที่:</span><span class="display-date" style="font-weight:700;">-</span></div>
+                    <div class="info-row" style="margin-top:15px; border-top: 1px dashed #ffe4e1; padding-top: 10px;">
+                        <span>ที่นั่งที่เลือก:</span><span class="display-seats" style="color:#ff69b4; font-weight:700; text-align:right;">-</span>
+                    </div>
+                    
+                    <div class="total-price">
+                        <div style="font-size:14px; color:#a1828a; font-weight:400; margin-bottom:5px;">รวมค่าบัตร</div>
+                        <span class="display-ticket-price">0 บาท</span>
+                    </div>
+                    
+                    <button class="btn" onclick="goToFoodPage()">ดำเนินการต่อ (เลือกของกิน) 🍿</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="food-page" class="page-section">
+            <button class="btn-back" onclick="showPage('booking-page')">⬅️ กลับไปหน้าเลือกที่นั่ง</button>
+            <div class="content-layout">
+                <div class="main-panel">
+                    <h2 style="color:#d0417e;">🍿 ของว่างและเครื่องดื่ม (รับหน้างาน)</h2>
+                    <p style="color:#a1828a; font-size:14px; margin-bottom:10px;">รับของง่ายๆ ที่ <b>เคาน์เตอร์ทางเดินก่อนเข้าสู่เวที</b></p>
+                    
+                    <h3 class="food-section-title">⭐ จัดเซ็ตสุดคุ้ม (Combo Sets)</h3>
+                    <div class="food-grid" id="combo-menu-container"></div>
+
+                    <h3 class="food-section-title">🌭 สั่งแยก (A La Carte)</h3>
+                    <div class="food-grid" id="alacarte-menu-container"></div>
+                </div>
+
+                <div class="side-panel">
+                    <h2 class="display-artist-name">Concert Name</h2>
+                    <div class="info-row"><span>ที่นั่ง:</span><span class="display-seats" style="color:#ff69b4; font-weight:700; text-align:right;">-</span></div>
+                    <div class="info-row"><span>รวมค่าตั๋ว:</span><span class="display-ticket-price" style="font-weight:700;">0 บาท</span></div>
+                    <div class="info-row"><span>รวมค่าอาหาร:</span><span id="display-food-price" style="font-weight:700; color:#d0417e;">0 บาท</span></div>
+                    
+                    <div class="total-price">
+                        <div style="font-size:14px; color:#a1828a; font-weight:400; margin-bottom:5px;">ยอดชำระสุทธิ</div>
+                        <span class="display-total">0 บาท</span>
+                    </div>
+                    
+                    <button class="btn" onclick="openPaymentModal()">ชำระเงิน 💳</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="success-page" class="page-section" style="text-align:center;">
+            <div style="background: #e8f5e9; color: #2e7d32; padding: 15px; border-radius: 15px; margin-bottom: 20px; font-weight: 700;">✅ ชำระเงินสำเร็จ (Payment Successful)</div>
+            
+            <div class="ticket-wrapper" id="ticket-capture">
+                <div class="ticket-sticker" id="ticket-sticker"></div>
+                <div style="border-bottom: 2px dashed #ffcbd5; padding-bottom: 15px; margin-bottom: 15px;">
+                    <h2 id="ticket-concert-name" style="color:#ff69b4;">Concert</h2>
+                    <p id="ticket-date" style="font-size:14px; color:#6b4c35; margin-top:5px;">Date</p>
+                </div>
+                <div class="info-row"><span>ผู้จอง:</span><span id="ticket-user-display" style="font-weight:700;">-</span></div>
+                <div class="info-row"><span>ที่นั่งของคุณ:</span><span id="ticket-seats" style="font-weight:700; color:#ff69b4; text-align:right;">-</span></div>
+                
+                <div id="ticket-food-section" style="display:none; text-align:left; background:#fff0f5; padding:15px; border-radius:15px; margin-top:15px;">
+                    <p style="font-weight:700; color:#d0417e; font-size:14px; margin-bottom:10px;">🍔 รายการอาหารสั่งล่วงหน้า:</p>
+                    <div id="ticket-food-list"></div>
+                    <p style="font-size:12px; color:#c0392b; margin-top:10px; font-weight:600;">📍 นำ QR โชว์ที่ "เคาน์เตอร์ก่อนเข้าเวที"</p>
+                </div>
+                <div class="qr-box"><img src="pianoQR.jpeg" alt="QR Code"></div>
+            </div>
+
+            <div class="customizer-panel" id="ticket-customizer">
+                <h3>🎨 แต่งตั๋วของคุณ</h3>
+                <div class="customizer-grid">
+                    <button class="customizer-btn" onclick="applyTicketTheme('theme-sweet', '🎀', this)">Sweet Pink</button>
+                    <button class="customizer-btn" onclick="applyTicketTheme('theme-night', '💜', this)">Kuromi Night</button>
+                    <button class="customizer-btn" onclick="applyTicketTheme('theme-mint', '🌿', this)">Mint Pop</button>
+                    <button class="customizer-btn" onclick="skipTicketCustomizer()">Skip</button>
+                </div>
+            </div>
+
+            <div style="max-width:450px; margin: 20px auto; padding-top: 20px; border-top: 2px dashed #ffcbd5;">
+                <h3 style="color:#d0417e; margin-bottom:10px;">🔥 กิจกรรมพิเศษสำหรับผู้ซื้อบัตร!</h3>
+                <button class="btn" style="background: #9b59b6;" onclick="openVotingPage()">🎵 โหวตลำดับเพลง (Setlist Voting)</button>
+            </div>
+            <button class="btn btn-secondary" style="max-width:450px; margin: 10px auto;" onclick="downloadTicket()">📥 ดาวน์โหลดตั๋ว</button>
+            <button class="btn btn-secondary" style="max-width:450px; margin: 10px auto;" onclick="showPage('food-page', true)">ย้อนกลับ</button>
+        </div>
+
+        <div id="voting-page" class="page-section">
+            <div class="vote-container">
+                <button class="btn-back" onclick="showPage('success-page', true)">ย้อนกลับ</button>
+                <h1 style="color:#d0417e; font-size:26px;">จัด Setlist คอนเสิร์ต <br><span id="vote-artist-name" style="color:#ff69b4;">Artist</span></h1>
+                <p style="color:#a1828a; margin-top:10px; font-size:15px;">✨ กดค้างที่ชื่อเพลงแล้ว "ลากขึ้นลง" เพื่อจัดอันดับ</p>
+                <ul id="setlist-songs" class="sortable-list"></ul>
+                <button class="btn" style="margin-top: 30px;" onclick="submitVote()">✅ ยืนยันการโหวต Setlist</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal-overlay" id="guide-modal">
+        <div class="modal-content guide-modal">
+            <span class="close-modal" onclick="closeGuideModal()">✖</span>
+            <h2 style="color:#d0417e; margin-bottom:8px;">คำแนะนำเว็บไซต์</h2>
+            <p style="color:#a1828a; font-size:14px;">เลือกหมวดที่อยากดู แล้วทำตามขั้นตอนได้เลย</p>
+            <div class="guide-tabs" id="guide-tabs"></div>
+            <div class="guide-detail" id="guide-detail"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="payment-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closePaymentModal()">✖</span>
+            <h2 style="color:#d0417e; margin-bottom:20px;">เลือกช่องทางชำระเงิน</h2>
+            <div id="payment-options">
+                <div class="payment-option" onclick="selectPayment(this)"><span style="font-size: 24px;">📱</span> <div><strong>สแกน QR พร้อมเพย์</strong></div></div>
+                <div class="payment-option" onclick="selectPayment(this)"><span style="font-size: 24px;">💳</span> <div><strong>บัตรเครดิต / เดบิต</strong></div></div>
+            </div>
+            <div id="loading-spinner"></div>
+            <p id="payment-status-text" style="display:none; color:#a1828a; font-size:14px; margin-top:15px;">กำลังตรวจสอบยอดเงิน...</p>
+            <button class="btn" id="confirm-pay-btn" onclick="processPayment()" style="margin-top: 20px;">ยืนยันการชำระเงิน</button>
+        </div>
+    </div>
+
+    <script>
+        // Data
+        let currentConcert = {};
+        let zonePricing = {};
+        let selectedSeats = []; // เก็บเป็น Array ของ Object [{num: 1, price: 4500, zone: 'A'}]
+        const occupiedSeats = [7, 12, 13, 24, 45, 50, 88, 112];
+        let currentUser = "";
+        let pageHistory = ['artist-page'];
+        const artistPriceSets = {
+            "My Sweet Piano": { A: 4200, B: 3200, C: 2200, D: 1200 },
+            "My Melody": { A: 3900, B: 2900, C: 1900, D: 900 },
+            "Kuromi": { A: 4500, B: 3500, C: 2400, D: 1400 }
+        };
+        const moodProfiles = {
+            close: { zone: 'A', label: 'ใกล้เวที', reason: 'เห็นเวทีชัดที่สุด เหมาะกับคนอยากอินกับโชว์แบบเต็ม ๆ' },
+            photo: { zone: 'B', label: 'ถ่ายรูปสวย', reason: 'ยังใกล้เวที แต่มีระยะให้เก็บภาพรวมและแสงเวทีได้ง่ายกว่า' },
+            friends: { zone: 'C', label: 'มากับเพื่อน', reason: 'สมดุลราคาและพื้นที่ เหมาะกับการเลือกที่นั่งติดกันหลายคน' },
+            budget: { zone: 'D', label: 'งบประหยัด', reason: 'ราคาน่ารักที่สุด ยังดูโชว์ครบและคุมงบได้ดี' }
+        };
+        const guideContent = {
+            login: {
+                title: 'เข้าสู่ระบบ',
+                steps: ['กรอกชื่อของคุณเพื่อเริ่มใช้งาน', 'ระบบจะจำไว้เฉพาะ session นี้ ถ้ายังไม่กดออกหรือปิด session ก็ไม่ต้อง login ใหม่', 'กดปุ่มออกเมื่อต้องการให้กลับไปหน้า login']
+            },
+            concert: {
+                title: 'เลือกคอนเสิร์ต',
+                steps: ['เลือกศิลปินจากหน้าแรก', 'แต่ละศิลปินมีราคาโซน A-D ไม่เท่ากัน', 'กดชื่อเทศกาลบนแถบด้านบนเพื่อกลับหน้าเลือกศิลปิน']
+            },
+            seats: {
+                title: 'เลือกที่นั่ง',
+                steps: ['โซน A อยู่ใกล้เวทีที่สุด แล้วไล่ลงมาเป็น B, C, D', 'แต่ละโซนมี 2 แถว กดเลขที่นั่งเพื่อเลือกหรือกดซ้ำเพื่อยกเลิก', 'เลือกได้สูงสุด 6 ที่นั่งต่อการจอง']
+            },
+            food: {
+                title: 'อาหารและคอมโบ',
+                steps: ['หลังเลือกที่นั่งแล้วกดไปหน้าเลือกของกิน', 'เลือกได้ทั้งเมนูแยกและ Combo สำหรับมาเป็นกลุ่ม', 'จำนวนอาหารจะถูกรวมเข้ากับยอดชำระอัตโนมัติ']
+            },
+            payment: {
+                title: 'ชำระเงินและตั๋ว',
+                steps: ['ตรวจยอดรวม แล้วเลือกช่องทางชำระเงิน', 'เมื่อชำระสำเร็จ ระบบจะแสดง E-Ticket พร้อม QR', 'สามารถดาวน์โหลดตั๋วเป็นรูปภาพได้']
+            },
+            vote: {
+                title: 'โหวตเพลง',
+                steps: ['หลังชำระเงินสำเร็จจะมีปุ่มโหวต Setlist', 'ลากชื่อเพลงขึ้นลงเพื่อจัดอันดับ', 'กดยืนยันเพื่อส่งลำดับเพลงที่อยากฟัง']
+            }
+        };
+        
+        // --- Food Menu Data (อัปเดตมี Combo) ---
+        const foodMenu = [
+            { id: 'cb_couple', name: '👩‍❤️‍👨 Couple Set', desc: 'ป๊อปคอร์น 1 + ขนมกรุบกรอบ 1 + น้ำอัดลม 2', price: 299, isCombo: true },
+            { id: 'cb_friends', name: '👯 Friends Combo', desc: 'สำหรับ 3 คน: ป๊อปคอร์น 2 + ฮอทดอก 2 + น้ำอัดลม 3', price: 590, isCombo: true },
+            { id: 'cb_squad', name: '🎉 Squad Combo', desc: 'สำหรับ 4 คน: ป๊อปคอร์น 3 + ขนมกรุบกรอบ 2 + น้ำอัดลม 4', price: 790, isCombo: true },
+            { id: 'cb_party', name: '🌸 Party Group Combo', desc: 'สำหรับ 5 คน: ป๊อปคอร์น 4 + แซนวิช 3 + น้ำอัดลม 5', price: 990, isCombo: true },
+            
+            { id: 'popcorn', name: '🍿 ป๊อปคอร์นซานริโอ้', desc: 'รสคาราเมลหวานฉ่ำ', price: 120, isCombo: false },
+            { id: 'cola', name: '🥤 น้ำอัดลม', desc: 'แก้วใหญ่จุใจ', price: 60, isCombo: false },
+            { id: 'water', name: '💧 น้ำแร่ธรรมชาติ', desc: 'ขวดพกพาง่าย', price: 30, isCombo: false },
+            { id: 'hotdog', name: '🌭 ฮอทดอก', desc: 'ชีสเยิ้มๆ', price: 80, isCombo: false },
+            { id: 'snack_pack', name: '🥨 ขนมกรุบกรอบ', desc: 'รวมมันฝรั่งทอด เพรทเซล และแครกเกอร์', price: 85, isCombo: false },
+            { id: 'jelly', name: '🍬 เยลลี่ซานริโอ้', desc: 'ขนมขบเคี้ยวหวานนุ่ม พกง่าย', price: 70, isCombo: false },
+            { id: 'sandwich', name: '🥪 แซนวิชแฮมชีส', desc: 'ทานง่าย รองท้องได้ดี', price: 80, isCombo: false }
+        ];
+        let cartFood = {}; 
+
+        // Songs Database
+        const artistSongs = {
+            "My Sweet Piano": ["Perfect - Ed Sheeran", "A Thousand Years - Christina Perri", "Just The Way You Are - Bruno Mars", "Make You Feel My Love - Adele", "All of Me - John Legend", "Can't Help Falling in Love - Elvis Presley", "Thinking Out Loud - Ed Sheeran", "You're Still The One - Shania Twain", "Everything - Michael Bublé", "Love Story - Taylor Swift"],
+            "My Melody": ["Lover - Taylor Swift", "Sugar - Maroon 5", "We Found Love - Rihanna", "Teenage Dream - Katy Perry", "Love On Top - Beyoncé", "Into You - Ariana Grande", "As It Was - Harry Styles", "Levitating - Dua Lipa", "Marry You - Bruno Mars", "Symphony - Clean Bandit"],
+            "Kuromi": ["I Miss You - Blink-182", "Still Into You - Paramore", "The Only Exception - Paramore", "Check Yes Juliet - We The Kings", "First Date - Blink-182", "Yellow - Coldplay", "You And Me - Lifehouse", "Iris - The Goo Goo Dolls", "Chasing Cars - Snow Patrol", "Wonderwall - Oasis"]
+        };
+
+        // --- Init & Login ---
+        window.onload = function() {
+            const savedUser = sessionStorage.getItem('sanrioUser');
+            if (savedUser) { currentUser = savedUser; document.getElementById('display-username').innerText = currentUser; } 
+            else { document.getElementById('login-overlay').style.display = 'flex'; }
+            updateBackButton();
+            renderGuideTabs();
+        };
+        function performLogin() {
+            const name = document.getElementById('login-name').value;
+            if (name.trim() === "") return alert("กรุณาใส่ชื่อก่อนครับ");
+            sessionStorage.setItem('sanrioUser', name); currentUser = name;
+            document.getElementById('display-username').innerText = name;
+            document.getElementById('login-overlay').style.display = 'none';
+        }
+        function logout() {
+            sessionStorage.removeItem('sanrioUser');
+            currentUser = "";
+            document.getElementById('display-username').innerText = 'Guest';
+            document.getElementById('login-name').value = '';
+            pageHistory = ['artist-page'];
+            showPage('artist-page', true);
+            document.getElementById('login-overlay').style.display = 'flex';
+        }
+        function updateBackButton() {
+            const backBtn = document.getElementById('global-back-btn');
+            const activePage = document.querySelector('.page-section.page-active')?.id;
+            if (backBtn) backBtn.classList.toggle('show', activePage && activePage !== 'artist-page');
+        }
+        function showPage(pageId, skipHistory = false) {
+            const activePage = document.querySelector('.page-section.page-active')?.id;
+            if (!skipHistory && activePage && activePage !== pageId) pageHistory.push(activePage);
+            document.querySelectorAll('.page-section').forEach(p => p.classList.remove('page-active'));
+            document.getElementById(pageId).classList.add('page-active'); window.scrollTo(0,0);
+            updateBackButton();
+        }
+        function goBack() {
+            const previousPage = pageHistory.pop() || 'artist-page';
+            showPage(previousPage, true);
+        }
+        function renderGuideTabs(activeKey = 'login') {
+            const tabs = document.getElementById('guide-tabs');
+            if (!tabs) return;
+            tabs.innerHTML = Object.entries(guideContent).map(([key, item]) => `
+                <button class="guide-tab ${key === activeKey ? 'active' : ''}" onclick="showGuideCategory('${key}')">${item.title}</button>
+            `).join('');
+            showGuideCategory(activeKey);
+        }
+        function showGuideCategory(key) {
+            const item = guideContent[key] || guideContent.login;
+            document.querySelectorAll('.guide-tab').forEach(tab => tab.classList.remove('active'));
+            const activeTab = Array.from(document.querySelectorAll('.guide-tab')).find(tab => tab.textContent === item.title);
+            if (activeTab) activeTab.classList.add('active');
+            document.getElementById('guide-detail').innerHTML = `
+                <h3>${item.title}</h3>
+                <ul>${item.steps.map(step => `<li>${step}</li>`).join('')}</ul>
+            `;
+        }
+        function openGuideModal() {
+            renderGuideTabs();
+            document.getElementById('guide-modal').style.display = 'flex';
+        }
+        function closeGuideModal() {
+            document.getElementById('guide-modal').style.display = 'none';
+        }
+
+        // --- Booking & AI Logic ---
+        function startBooking(name, date, prices) {
+            zonePricing = { ...prices };
+            
+            currentConcert = { name, date };
+            selectedSeats = [];
+            cartFood = {}; 
+            
+            // รีเซ็ต AI Box
+            document.getElementById('ai-budget-input').value = '';
+            document.getElementById('ai-result').style.display = 'none';
+            document.getElementById('mood-result').style.display = 'none';
+            document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.querySelectorAll('.display-artist-name').forEach(el => el.innerText = name);
+            document.querySelectorAll('.display-date').forEach(el => el.innerText = date);
+            
+            // โชว์ราคาที่หัวบล็อค
+            document.getElementById('price-A').innerText = zonePricing['A'] + '.-';
+            document.getElementById('price-B').innerText = zonePricing['B'] + '.-';
+            document.getElementById('price-C').innerText = zonePricing['C'] + '.-';
+            document.getElementById('price-D').innerText = zonePricing['D'] + '.-';
+            
+            renderFrontStageMap(); updateSummary(); renderFoodMenu();
+            showPage('booking-page');
+        }
+
+        function aiAnalyzeBudget() {
+            const budget = parseInt(document.getElementById('ai-budget-input').value);
+            const resultBox = document.getElementById('ai-result');
+            
+            if(isNaN(budget) || budget <= 0) {
+                alert('กรุณากรอกตัวเลขงบประมาณให้ถูกต้องครับ'); return;
+            }
+
+            resultBox.style.display = 'block';
+            
+            // หาโซนที่แพงที่สุด แต่งบยังจ่ายไหว
+            if(budget >= zonePricing['A']) {
+                resultBox.innerHTML = `<span style="color:#2e7d32;">✨ เยี่ยมมาก! งบของคุณสามารถนั่ง <b>โซน A (ติดเวที)</b> ได้เลยครับ ลุยเลย! (ราคา ${zonePricing['A']} บาท)</span>`;
+                resultBox.style.background = '#e8f5e9';
+            } else if(budget >= zonePricing['B']) {
+                resultBox.innerHTML = `<span style="color:#1565c0;">✨ AI แนะนำ: <b>โซน B</b> คุ้มค่าและอยู่ในงบของคุณครับ (ราคา ${zonePricing['B']} บาท)</span>`;
+                resultBox.style.background = '#e3f2fd';
+            } else if(budget >= zonePricing['C']) {
+                resultBox.innerHTML = `<span style="color:#e65100;">✨ AI แนะนำ: <b>โซน C</b> เป็นตัวเลือกที่ดีที่สุดสำหรับงบนี้ครับ (ราคา ${zonePricing['C']} บาท)</span>`;
+                resultBox.style.background = '#fff3e0';
+            } else if(budget >= zonePricing['D']) {
+                resultBox.innerHTML = `<span style="color:#6a1b9a;">✨ AI แนะนำ: <b>โซน D</b> สามารถเข้าชมคอนเสิร์ตนี้ได้ในงบประหยัดครับ! (ราคา ${zonePricing['D']} บาท)</span>`;
+                resultBox.style.background = '#f3e5f5';
+            } else {
+                resultBox.innerHTML = `<span style="color:#c62828;">😭 อ๊ะ! งบของคุณยังไม่พอสำหรับคอนเสิร์ตนี้ครับ (โซน D เริ่มต้นที่ ${zonePricing['D']} บาท)</span>`;
+                resultBox.style.background = '#ffebee';
+            }
+        }
+
+        function recommendMoodSeat(moodKey, button) {
+            const profile = moodProfiles[moodKey] || moodProfiles.close;
+            const zoneRanges = { A: [1, 30], B: [31, 60], C: [61, 90], D: [91, 120] };
+            const [start, end] = zoneRanges[profile.zone];
+            const recommended = [];
+            for (let seat = start; seat <= end && recommended.length < 4; seat++) {
+                if (!occupiedSeats.includes(seat) && !selectedSeats.some(s => s.num === seat)) recommended.push(seat);
+            }
+
+            document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('active'));
+            if (button) button.classList.add('active');
+            document.querySelectorAll('.seat.recommended').forEach(seat => seat.classList.remove('recommended'));
+            recommended.forEach(num => {
+                const seatEl = Array.from(document.querySelectorAll('.seat')).find(seat => seat.innerText === String(num));
+                if (seatEl) seatEl.classList.add('recommended');
+            });
+
+            const resultBox = document.getElementById('mood-result');
+            resultBox.style.display = 'block';
+            resultBox.innerHTML = `<b>${profile.label}: แนะนำโซน ${profile.zone}</b><br>${profile.reason}<br><span style="color:#d0417e; font-weight:700;">ที่นั่งแนะนำ: ${recommended.join(', ')}</span>`;
+            document.querySelector(`.zone-${profile.zone}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function renderFrontStageMap() {
+            const renderBlock = (id, start, end, zoneName) => {
+                const c = document.getElementById(id); c.innerHTML = '';
+                for (let i=start; i<=end; i++) {
+                    const s = document.createElement('div'); s.className = 'seat'; s.innerText = i;
+                    if (occupiedSeats.includes(i)) s.classList.add('occupied');
+                    else s.onclick = () => toggleSeat(s, i, zoneName);
+                    c.appendChild(s);
+                }
+            };
+            renderBlock('gridA', 1, 30, 'A'); renderBlock('gridB', 31, 60, 'B');
+            renderBlock('gridC', 61, 90, 'C'); renderBlock('gridD', 91, 120, 'D');
+        }
+
+        function toggleSeat(el, num, zoneName) {
+            const seatIndex = selectedSeats.findIndex(s => s.num === num);
+            if (seatIndex > -1) {
+                selectedSeats.splice(seatIndex, 1);
+                el.classList.remove('selected');
+            } else {
+                if (selectedSeats.length >= 6) return alert('จองได้สูงสุด 6 ที่นั่ง');
+                selectedSeats.push({ num: num, price: zonePricing[zoneName], zone: zoneName });
+                el.classList.add('selected');
+            }
+            updateSummary();
+        }
+
+        // --- Food Menu Logic ---
+        function goToFoodPage() {
+            if (selectedSeats.length === 0) return alert('กรุณาเลือกที่นั่งก่อนดำเนินการต่อครับ');
+            showPage('food-page');
+        }
+
+        function renderFoodMenu() {
+            const comboContainer = document.getElementById('combo-menu-container');
+            const alaContainer = document.getElementById('alacarte-menu-container');
+            comboContainer.innerHTML = ''; alaContainer.innerHTML = '';
+
+            foodMenu.forEach(item => {
+                const qty = cartFood[item.id] || 0;
+                const html = `
+                    <div class="food-card ${item.isCombo ? 'combo' : ''}">
+                        <div class="food-info">
+                            <span class="food-title">${item.name}</span>
+                            <span class="food-desc">${item.desc}</span>
+                            <span class="food-price">${item.price} บาท</span>
+                        </div>
+                        <div class="qty-control">
+                            <button class="qty-btn" onclick="updateFoodQty('${item.id}', -1)">-</button>
+                            <span class="qty-number" id="qty-${item.id}">${qty}</span>
+                            <button class="qty-btn" onclick="updateFoodQty('${item.id}', 1)">+</button>
+                        </div>
+                    </div>
+                `;
+                if(item.isCombo) comboContainer.innerHTML += html;
+                else alaContainer.innerHTML += html;
+            });
+        }
+
+        function updateFoodQty(id, change) {
+            let currentQty = cartFood[id] || 0;
+            currentQty += change;
+            if (currentQty < 0) currentQty = 0;
+            if (currentQty > 10) return alert('จำกัดสั่งได้สูงสุด 10 ชิ้นต่อเมนูครับ');
+            cartFood[id] = currentQty;
+            document.getElementById(`qty-${id}`).innerText = currentQty;
+            updateSummary();
+        }
+
+        // --- Calculation Update ---
+        function updateSummary() {
+            // คำนวณค่าตั๋วโดยบวกราคาแต่ละที่นั่งที่เลือก (เพราะราคาไม่เท่ากันแล้ว)
+            let ticketTotal = 0;
+            let seatLabels = [];
+            selectedSeats.forEach(s => {
+                ticketTotal += s.price;
+                seatLabels.push(`${s.num}(โซน${s.zone})`);
+            });
+            
+            let foodTotal = 0;
+            foodMenu.forEach(item => { if(cartFood[item.id]) foodTotal += item.price * cartFood[item.id]; });
+            const grandTotal = ticketTotal + foodTotal;
+
+            const seatText = selectedSeats.length > 0 ? seatLabels.join(', ') : '-';
+            document.querySelectorAll('.display-seats').forEach(el => el.innerHTML = seatText.replace(/,/g, '<br>'));
+            document.querySelectorAll('.display-ticket-price').forEach(el => el.innerText = ticketTotal.toLocaleString() + ' บาท');
+            document.getElementById('display-food-price').innerText = foodTotal.toLocaleString() + ' บาท';
+            document.querySelectorAll('.display-total').forEach(el => el.innerText = grandTotal.toLocaleString() + ' บาท');
+        }
+
+        function applyTicketTheme(themeClass, sticker, button) {
+            const ticket = document.getElementById('ticket-capture');
+            ticket.classList.remove('theme-sweet', 'theme-night', 'theme-mint');
+            ticket.classList.add(themeClass);
+            document.getElementById('ticket-sticker').innerText = sticker;
+            document.querySelectorAll('.customizer-btn').forEach(btn => btn.classList.remove('active'));
+            if (button) button.classList.add('active');
+        }
+
+        function skipTicketCustomizer() {
+            document.getElementById('ticket-customizer').style.display = 'none';
+        }
+
+        // --- Payment & Success ---
+        function openPaymentModal() { document.getElementById('payment-modal').style.display = 'flex'; }
+        function closePaymentModal() { document.getElementById('payment-modal').style.display = 'none'; }
+        function selectPayment(el) { document.querySelectorAll('.payment-option').forEach(p => p.classList.remove('active')); el.classList.add('active'); }
+        
+        function processPayment() {
+            if(!document.querySelector('.payment-option.active')) return alert('กรุณาเลือกช่องทางชำระเงิน');
+            document.getElementById('payment-options').style.display='none'; document.getElementById('confirm-pay-btn').style.display='none';
+            document.getElementById('loading-spinner').style.display='block'; document.getElementById('payment-status-text').style.display='block';
+
+            setTimeout(() => { 
+                closePaymentModal(); showPage('success-page');
+                
+                document.getElementById('ticket-concert-name').innerText = currentConcert.name;
+                document.getElementById('ticket-date').innerText = currentConcert.date;
+                document.getElementById('ticket-capture').classList.remove('theme-sweet', 'theme-night', 'theme-mint');
+                document.getElementById('ticket-sticker').innerText = '';
+                document.getElementById('ticket-customizer').style.display = 'block';
+                document.querySelectorAll('.customizer-btn').forEach(btn => btn.classList.remove('active'));
+                let seatLabels = selectedSeats.map(s => `${s.num}(${s.zone})`);
+                document.getElementById('ticket-seats').innerText = seatLabels.join(', ');
+                document.getElementById('ticket-user-display').innerText = currentUser;
+
+                let foodHtml = ''; let hasFood = false;
+                foodMenu.forEach(item => {
+                    if (cartFood[item.id] > 0) {
+                        hasFood = true;
+                        foodHtml += `<div class="food-receipt-item"><span>${item.name} x${cartFood[item.id]}</span><span>${(item.price * cartFood[item.id])}.-</span></div>`;
+                    }
+                });
+
+                if (hasFood) {
+                    document.getElementById('ticket-food-section').style.display = 'block';
+                    document.getElementById('ticket-food-list').innerHTML = foodHtml;
+                } else {
+                    document.getElementById('ticket-food-section').style.display = 'none';
+                }
+                
+                document.getElementById('payment-options').style.display='block'; document.getElementById('confirm-pay-btn').style.display='block';
+                document.getElementById('loading-spinner').style.display='none'; document.getElementById('payment-status-text').style.display='none';
+            }, 1500);
+        }
+
+        function downloadTicket() { html2canvas(document.getElementById('ticket-capture'), { backgroundColor: '#ffffff', scale: 2 }).then(canvas => { const link = document.createElement('a'); link.download = `Ticket.png`; link.href = canvas.toDataURL(); link.click(); }); }
+
+        // --- Voting Logic ---
+        function openVotingPage() {
+            showPage('voting-page'); document.getElementById('vote-artist-name').innerText = currentConcert.name;
+            const list = document.getElementById('setlist-songs'); list.innerHTML = '';
+            const songs = artistSongs[currentConcert.name] || artistSongs["My Sweet Piano"];
+            songs.forEach((song, idx) => { list.innerHTML += `<li class="sortable-item"><div><span class="rank-number">${idx+1}</span><span>${song}</span></div><span style="font-size:20px; color:#ffb6c1;">☰</span></li>`; });
+            new Sortable(list, { animation: 150, onEnd: function() { list.querySelectorAll('.rank-number').forEach((item, idx) => item.innerText = idx + 1); }});
+        }
+        function submitVote() { alert(`ขอบคุณคุณ ${currentUser} โหวต Setlist สำเร็จ! 🌸`); location.reload(); }
+    </script>
+</body>
+</html>
